@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fl.wdl.mapper.SongListMapper" >
+  <select id="getSongListsByStyle" resultType="com.fl.wdl.pojo.SongList">
+  	select sl.* from song_list sl,song_list_style slt where slt.style_id=#{styleId} and slt.song_list_id = sl.id
+  </select>
+  <select id="getSongListsByScene" resultType="com.fl.wdl.pojo.SongList">
+  	select sl.* from song_list sl,song_list_scene sls where sls.scene_id=#{sceneId} and sls.song_list_id = sl.id
+  </select>
+  <resultMap type="com.fl.wdl.pojo.SongList" id="songList">
+  	<id column="slid" property="id"/>
+  	<result column="title" property="title"/>
+  	<result column="slcover" property="cover"/>
+  	<result column="slcomment_count" property="commentCount"/>
+  	<result column="song_count" property="songCount"/>
+  	<collection property="songs" ofType="com.fl.wdl.pojo.Song">
+  		<id column="sid" property="id"/>
+  		<result column="scover" property="cover"/>
+  		<result column="song_name" property="songName"/>
+  		<result column="singer_name" property="singerName"/>
+  		<result column="is_vip" property="isVip"/>
+  		<result column="song_time" property="songTime"/>
+  		<result column="scomment_count" property="commentCount"/>
+  		<result column="lyric" property="lyric"/>
+  		<result column="url" property="url"/>
+  	</collection>
+  </resultMap>
+  <select id="getSongListById" resultMap="songList">
+  	select sl.id slid,
+  	       song.id sid,
+  	       sl.cover slcover,
+  	       song.cover scover,
+  	       sl.comment_count slcomment_count,
+  	       song_count,
+  	       song.comment_count scomment_count,
+  	       song_name,
+  	       singer_name,
+  	       is_vip,
+  	       song_time,
+  	       lyric,
+  	       url,
+  	       title
+  	       from (song_list sl left join song_list_song sls on sls.song_list_id = sl.id) left join song on sls.song_id=song.id where sl.id=#{id}
+  </select>
+  <select id="getSongListsBySingerId" resultType="com.fl.wdl.pojo.SongList">
+  	select sl.* from song_list sl,singer_song_list ssll where sl.id = ssll.song_list_id and ssll.singer_id=#{singerId}
+  </select>
+  <select id="getSongListByAllMatchTitle" resultType="com.fl.wdl.pojo.SongList">
+  	select * from song_list where title=#{title}
+  </select>
+  <!-- <insert id="setStyle">
+  	insert into song_list_style (id,song_list_id,style_id)values(null,#{songListId},#{styleId})
+  </insert> -->
+  <update id="updateById">
+  	update song_list set title=#{title},cover=#{cover},comment_count=#{commentCount},song_count=#{songCount},create_time=#{createTime} where id = #{id}
+  </update>
+  <insert id="setScene">
+  	insert into song_list_scene (id,song_list_id,scene_id)values(null,#{songListId},#{sceneId})
+  </insert>
+  <insert id="addSong">
+  	insert into song_list_song (id,song_list_id,song_id)values(null,#{songListId},#{songId})
+  </insert>
+  <select id="getStyles" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from song_list_style,style where song_id=#{songListId} and style_id=style.id
+  </select>
+  <select id="getScenes" resultType="com.fl.wdl.pojo.Scene">
+  	select scene.* from song_list_scene,scene where song_id=#{songListId} and scene_id=scene.id
+  </select>
+  <select id="getSongListByAllMatchListTitle" resultType="com.fl.wdl.pojo.SongList">
+  	select * from song_list where title=#{title} order by create_time desc
+  </select>
+  <select id="getSongListsByAllMatchTitle" resultType="com.fl.wdl.pojo.SongList">
+  	select * from song_list where title like concat('%',#{title},'%')
+  </select>
+  <update id="addCommentCount">
+  	update song_list set comment_count=comment_count+1 where id=#{id}
+  </update>
+  <update id="reduceCommentCount">
+  	update song_list set comment_count=comment_count-1 where id=#{id}
+  </update>
+  <insert id="insert">
+  	insert into song_list (id,title,cover,song_count,create_time)values(#{id},#{title},#{cover},#{songCount},#{createTime})
+  </insert>
+</mapper>

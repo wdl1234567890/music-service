@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fl.wdl.mapper.StyleMapper" >
+  <select id="getStylesByUserId" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from user_style,style where user_style.user_id=#{userId} and style.id = user_style.style_id
+  </select>
+  <insert id="addStyleToUser">
+  	insert into user_style values(null,#{userId},#{styleId})
+  </insert>
+  <delete id="removeStyleFromUser">
+  	delete from user_style where user_id=#{userId} and style_id=#{styleId}
+  </delete>
+  <select id="getUserStyleByUserId" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from user_style,style where user_id=#{userId} and style_id=#{styleId} and style.id=style_id
+  </select>
+  
+  <insert id="addStyleToSong">
+  	insert into song_style (id,song_id,style_id)values(null,#{songId},#{styleId})
+  </insert>
+  <select id="getStylesFromSong" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from song_style,style where song_id=#{songId} and style_id=style.id
+  </select>
+  <select id="getStyleBySongIdAndStyleId" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from song_style,style where song_id=#{songId} and style_id=#{styleId} and style.id=style_id
+  </select>
+  
+  <select id="getStylesFromSongList" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from song_list_style,style where song_list_id=#{songListId} and style_id=style.id
+  </select>
+  <select id="getStyleBySongListIdAndStyleId" resultType="com.fl.wdl.pojo.Style">
+  	select style.* from song_list_style,style where song_list_id=#{songListId} and style_id=#{styleId} and style.id=style_id
+  </select>
+  <insert id="addStyleToSongList">
+  	insert into song_list_style (id,song_list_id,style_id)values(null,#{songListId},#{styleId})
+  </insert>
+</mapper>

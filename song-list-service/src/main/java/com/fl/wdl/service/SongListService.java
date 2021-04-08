@@ -1,0 +1,150 @@
+package com.fl.wdl.service;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import com.fl.wdl.constant.ResponseStatus;
+import com.fl.wdl.exception.FLException;
+import com.fl.wdl.mapper.SongListMapper;
+import com.fl.wdl.pojo.Scene;
+import com.fl.wdl.pojo.Song;
+import com.fl.wdl.pojo.SongList;
+import com.fl.wdl.pojo.SongListScene;
+import com.fl.wdl.pojo.SongListStyle;
+import com.fl.wdl.pojo.Style;
+
+@Service
+public class SongListService {
+	
+	@Autowired
+	SongListMapper songListMapper;
+	
+	@Autowired
+	StyleService styleService;
+	
+	@Autowired
+	SceneService sceneService;
+	
+	public SongList getSongListById(String id) {
+		if(id == null || id.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return songListMapper.getSongListById(id);
+	}
+	
+	public String addSongList(SongList songList) {
+		if(songList == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		SongList songList1 = songListMapper.getSongListByAllMatchTitle(songList.getTitle());
+		if(songList1!=null) {
+			return songList1.getId();
+		}
+		
+		int result = songListMapper.insert(songList);
+		if(result < 1)throw new FLException(ResponseStatus.DATABASE_ERROR.code(),ResponseStatus.DATABASE_ERROR.message());
+		return songList.getId();
+	}
+	
+	public Boolean updateSongList(SongList songList) {
+		if(songList == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		int result = songListMapper.updateById(songList);
+		if(result < 1)return false;
+		return true;
+	}
+	
+	public Boolean addSong(String songListId,String songId) {
+		if(songListId == null || songListId.equals("") || songId == null || songId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		Song song = new Song();
+		song.setId(songId);
+		SongList songList = this.getSongListById(songListId);
+		if(songList == null || songList.getSongs() == null || songList.getSongs().contains(song))return false;
+		return songListMapper.addSong(songListId, songId);
+	}
+
+	
+	public List<Style> getStyles(String songListId){
+		if(songListId == null || songListId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return JSONArray.parseArray(JSONArray.toJSONString(styleService.getStylesFromSongList(songListId).getData()), Style.class);
+		
+	}
+	
+	public List<Scene> getScenes(String songListId){
+		if(songListId == null || songListId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return JSONArray.parseArray(JSONArray.toJSONString(sceneService.getScenesFromSongList(songListId).getData()), Scene.class);
+
+	}
+	
+	
+	public Boolean addStyle(String songListId,Integer styleId) {
+		if(songListId == null || songListId.equals("") || styleId == 0 || styleId < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		
+		SongListStyle songListStyle = new SongListStyle();
+		songListStyle.setSongListId(songListId);
+		songListStyle.setStyleId(styleId);
+		return styleService.addStyleToSongList(songListStyle).getSuccess();
+	}
+	
+	public Boolean addScene(String songListId,Integer sceneId) {
+		if(songListId == null || songListId.equals("") || sceneId == 0 || sceneId < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		
+		SongListScene songListScene = new SongListScene();
+		songListScene.setSongListId(songListId);
+		songListScene.setSceneId(sceneId);
+		return sceneService.addSceneToSongList(songListScene).getSuccess();
+	}
+	
+	
+	public List<SongList> getSongListsByStyle(String styleId){
+		if(styleId == null || styleId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return songListMapper.getSongListsByStyle(styleId);
+	}
+	
+	public List<SongList> getSongListsByScene(String sceneId){
+		if(sceneId == null || sceneId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return songListMapper.getSongListsByScene(sceneId);
+	}
+	
+	public SongList getSongListsBySingerId(String id){
+		if(id == null || id.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return songListMapper.getSongListsBySingerId(id);
+	}
+	
+    public SongList getRandomSongList(){
+    	List<SongList> songLists = songListMapper.getSongListsByAllMatchTitle("随机歌单");
+    	return this.getSongListById(songLists.get(0).getId());
+	}
+    
+    public SongList getHotSongList(){
+    	List<SongList> songLists = songListMapper.getSongListsByAllMatchTitle("热门歌单");
+    	return this.getSongListById(songLists.get(0).getId());
+    }
+    
+    public SongList getNewSongList(){
+    	List<SongList> songLists = songListMapper.getSongListsByAllMatchTitle("新歌歌单");
+    	return this.getSongListById(songLists.get(0).getId());
+    }
+    
+    public List<SongList> getSongListsByTitleLike(String title) {
+    	if(title == null || title.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+    	return songListMapper.getSongListsByAllMatchTitle(title);
+    }
+    
+    public Boolean addCommentCount(String id) {
+		if(id == null || id.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		SongList songList = this.getSongListById(id);
+		if(songList == null)throw new FLException(ResponseStatus.SONG_LIST_IS_NOT_EXISTED.code(),ResponseStatus.SONG_LIST_IS_NOT_EXISTED.message());
+		return songListMapper.addCommentCount(id); 
+	}
+	public Boolean reduceCommentCount(String id) {
+		if(id == null || id.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		SongList songList = this.getSongListById(id);
+		if(songList == null)throw new FLException(ResponseStatus.SONG_LIST_IS_NOT_EXISTED.code(),ResponseStatus.SONG_LIST_IS_NOT_EXISTED.message());
+		if(songList.getCommentCount() < 1)return false;	
+		return songListMapper.reduceCommentCount(id); 
+	}
+    
+}
+
+
+
+
+

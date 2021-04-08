@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fl.wdl.mapper.CommentMapper" >
+  <insert id="insertComment">
+  	insert into comment (id,content,song_or_list_id,level,from_id,reply_count,user_id,thumb_up_count,create_time)values(#{id},#{content},#{songOrListId},#{level},#{fromComment.id},#{replyCount},#{user.id},#{thumbUpCount},#{createTime})
+  </insert>
+  <resultMap type="com.fl.wdl.pojo.Comment" id="comment">
+  	<id column="id" property="id"/>
+  	<result column="content" property="content"/>
+  	<result column="song_or_list_id" property="songOrListId"/>
+  	<result column="level" property="level"/>
+  	<result column="reply_count" property="replyCount"/>
+  	<result column="thumb_up_count" property="thumbUpCount"/>
+  	<result column="create_time" property="createTime"/>
+  	<association property="user" javaType="com.fl.wdl.pojo.User">
+  		<result column="user_name" property="userName"/>
+  		<result column="avator" property="avator"/>
+  	</association>
+  </resultMap>
+
+  <resultMap type="com.fl.wdl.pojo.Comment" id="comment2">
+  	<id column="id" property="id"/>
+  	<result column="content" property="content"/>
+  	<result column="song_or_list_id" property="songOrListId"/>
+  	<result column="level" property="level"/>
+  	<result column="reply_count" property="replyCount"/>
+  	<result column="thumb_up_count" property="thumbUpCount"/>
+  	<result column="create_time" property="createTime"/>
+  	<association property="user" javaType="com.fl.wdl.pojo.User">
+  		<result column="user_name" property="userName"/>
+  		<result column="avator" property="avator"/>
+  	</association>
+  	<association property="fromComment" javaType="com.fl.wdl.pojo.Comment">
+  		<result column="ccontent" property="content"/>
+  		<association property="user" javaType="com.fl.wdl.pojo.User">
+  			<result column="uuser_name" property="userName"/>
+  			<result column="uavator" property="avator"/>
+  		</association>
+  	</association>
+  </resultMap>
+  
+  <select id="getLevelOneOrTwoListBySongOrListId" resultMap="comment">
+  	select comment.*,user_name,avator
+  	from comment,user
+  	where user.id = comment.user_id 
+  	      and from_id = #{id} 
+  	order by comment.create_time desc
+  </select>
+  <!-- <select id="getLevelTwoListByCommentId" resultMap="comment">
+  	select comment.*,user_name,avator
+  	from comment,user
+  	where user.id = comment.user_id 
+  	      and from_id = #{id} 
+  	      and level = 1
+  	order by comment.create_time desc
+  </select>-->
+  <select id="getLevelThreeListByCommentId" resultMap="comment2">
+  	select comment.*,user.user_name,user.avator,c.content ccontent,u.user_name uuser_name,u.avator uavator 
+  	from comment,user,comment c,user u 
+  	where user.id = comment.user_id 
+  	      and comment.from_id = #{id} 
+  	      and comment.level = 2
+  	      and comment.from_id = c.id
+  	      and c.user_id = u.id
+  	order by comment.create_time desc
+  </select>
+  <select id="selectById" resultMap="comment">
+  	select comment.*,user_name,avator
+  	from comment,user
+  	where user.id = comment.user_id 
+  	      and comment.id = #{id} 
+  	order by comment.create_time desc
+  </select>
+  <update id="addReplyCount">
+  	update comment set reply_count=reply_count+1 where id=#{id}
+  </update>
+  <update id="reduceReplyCount">
+  	update comment set reply_count=reply_count-1 where id=#{id}
+  </update>
+  <update id="addThumbUp">
+  	update comment set thumb_up_count=thumb_up_count+1 where id=#{id}
+  </update>
+  <update id="cancelThumbUp">
+  	update comment set thumb_up_count=thumb_up_count-1 where id=#{id}
+  </update>
+  <update id="softDeleteById">
+  	update comment set content='该评论已删除' where id=#{id} 
+  </update>
+</mapper>

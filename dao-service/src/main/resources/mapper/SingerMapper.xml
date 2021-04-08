@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fl.wdl.mapper.SingerMapper" >
+  <insert id="addSongList">
+  	insert into singer_song_list (id,singer_id,song_list_id)values(null,#{singerId},#{songListId})
+  </insert>
+  <select id="getSongList" resultType="com.fl.wdl.pojo.SongList">
+  	select song_list.* from singer_song_list,song_list where song_list.id=song_list_id and singer_id=#{id}
+  </select>
+</mapper>

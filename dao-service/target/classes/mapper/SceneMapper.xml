@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fl.wdl.mapper.SceneMapper" >
+  <insert id="addSceneToSong">
+  	insert into song_scene (id,song_id,scene_id)values(null,#{songId},#{sceneId})
+  </insert>
+  <select id="getScenesFromSong" resultType="com.fl.wdl.pojo.Scene">
+  	select scene.* from song_scene,scene where song_id=#{songId} and scene_id=scene.id
+  </select>
+  
+  <select id="getScenesFromSongList" resultType="com.fl.wdl.pojo.Scene">
+  	select scene.* from song_list_scene,scene where song_list_id=#{songListId} and scene_id=scene.id
+  </select>
+  <select id="getSceneBySongListIdAndSceneId" resultType="com.fl.wdl.pojo.Scene">
+  	select scene.* from song_list_scene,scene where song_list_id=#{songListId} and scene_id=#{sceneId} and scene.id=scene_id
+  </select>
+  <insert id="addSceneToSongList">
+  	insert into song_list_scene (id,song_list_id,scene_id)values(null,#{songListId},#{sceneId})
+  </insert>
+</mapper>
