@@ -107,6 +107,20 @@ public class SongService {
 	public int getSongCount() {
 		return songMapper.selectCount(null);
 	}
+	
+	public List<Song> getSongsByIds(List<String> ids){
+		if(ids == null || ids.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+		queryWrapper.in("id", ids);
+		return songMapper.selectList(queryWrapper);
+	}
+	
+	public List<Song> getSongsBySingerNames(List<String> singerNames){
+		if(singerNames == null || singerNames.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+		queryWrapper.in("singer_name", singerNames);
+		return songMapper.selectList(queryWrapper);
+	}
 }
 
 

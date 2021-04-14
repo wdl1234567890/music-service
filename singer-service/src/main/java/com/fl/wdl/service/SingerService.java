@@ -45,6 +45,12 @@ public class SingerService {
 		return singerMapper.selectList(queryWrapper);
 	}
 	
+	public List<Singer> getSingersBySingerNames(List<String> singerNames){
+		if(singerNames == null || singerNames.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(), ResponseStatus.PARAM_IS_EMPTY.message());
+		QueryWrapper<Singer> queryWrapper = new QueryWrapper<>();
+		queryWrapper.in("name", singerNames);
+		return singerMapper.selectList(queryWrapper);
+	}
 	
 //	public List<Singer> getSingers(){
 //		

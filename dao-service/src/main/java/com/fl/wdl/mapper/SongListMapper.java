@@ -17,7 +17,7 @@ public interface SongListMapper extends BaseMapper<SongList>{
 	SongList getSongListById(String id);
 	List<SongList> getSongListsByAllMatchTitle(String title);
 	List<SongList> getSongListsByLikeTitle(String title);
-	SongList getSongListsBySingerId(Integer singerId);
+	SongList getSongListBySingerId(Integer singerId);
 	SongList getSongListByAllMatchTitle(String title);
     public Boolean addCommentCount(String id);	
 	public Boolean reduceCommentCount(String id);
@@ -26,6 +26,7 @@ public interface SongListMapper extends BaseMapper<SongList>{
 //	Boolean setScene(@Param("songListId")String songListId,@Param("sceneId")Integer sceneId);
 	Boolean addSong(@Param("songListId")String songListId,@Param("songId")String songId);
 	int insert(SongList songList);
+	List<SongList> getSongListsOfTopSevenNew();
 	//	List<Style> getStyles(String songListId);
 //  List<Scene> getScenes(String songListId);
 }

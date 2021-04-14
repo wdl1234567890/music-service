@@ -98,10 +98,16 @@ public class SongListController {
 		return CommonResult.buildSuccess(songLists);
 	}
 	
-	@GetMapping("/singer/{singerId}/songLists")
-	public CommonResult getSongListsBySingerId(@PathVariable("singerId")Integer singerId){
-		SongList songLists = songListService.getSongListsBySingerId(singerId);
-		return CommonResult.buildSuccess(this.getSongListById(songLists.getId()));
+	@GetMapping("/singer/{singerId}/songList")
+	public CommonResult getSongListBySingerId(@PathVariable("singerId")Integer singerId){
+		SongList songList = songListService.getSongListBySingerId(singerId);
+		return CommonResult.buildSuccess(songListService.getSongListById(songList.getId()));
+	}
+	
+	@GetMapping("/singers/songLists")
+	public CommonResult getSongListsBySingerIds(@RequestBody List<Integer> singerIds) {
+		List<SongList> songLists = songListService.getSongListsBySingerIds(singerIds);
+		return CommonResult.buildSuccess(songLists);
 	}
 	
 	@GetMapping("/random")
@@ -154,5 +160,10 @@ public class SongListController {
 		Boolean result = songListService.reduceCommentCount(id); 
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError(); 
+	}
+	
+	@GetMapping("/topSevenNew")
+	public CommonResult getSongListsOfTopSevenNew() {
+		return CommonResult.buildSuccess(songListService.getSongListsOfTopSevenNew());
 	}
 }

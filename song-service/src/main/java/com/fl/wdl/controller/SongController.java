@@ -106,4 +106,14 @@ public class SongController {
 		int count = songService.getSongCount();
 		return CommonResult.buildSuccess(count);
 	}
+	
+	@GetMapping("/ids/songs")
+	public CommonResult getSongsByIds(@RequestBody List<String> ids) {
+		return CommonResult.buildSuccess(songService.getSongsByIds(ids));
+	}
+	
+	@GetMapping("/singers/songs")
+	public CommonResult getSongsBySingerNames(@RequestBody List<String> singerNames) {
+		return CommonResult.buildSuccess(songService.getSongsBySingerNames(singerNames));
+	}
 }

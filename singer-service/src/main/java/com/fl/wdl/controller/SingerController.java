@@ -44,5 +44,11 @@ public class SingerController {
 		return CommonResult.buildSuccess(singers);
 	}
 	
+	@GetMapping("/singerNames/Singers")
+	public CommonResult getSingersBySingerNames(@RequestBody List<String> singerNames){
+		List<Singer> singers = singerService.getSingersBySingerNames(singerNames);
+		return CommonResult.buildSuccess(singers);
+	}
+	
 	//getSongList
 }

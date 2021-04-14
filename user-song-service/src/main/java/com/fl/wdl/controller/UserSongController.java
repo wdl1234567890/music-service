@@ -1,7 +1,10 @@
 package com.fl.wdl.controller;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,23 +91,19 @@ public class UserSongController {
 //    	return CommonResult.buildSuccess(songs);
 //    }
     
-	@GetMapping("/hot")
-    public CommonResult getHotSongListInfo(){
-    	SongList songList = userSongService.getHotSongListInfo();
-    	return CommonResult.buildSuccess(songList);
+	@GetMapping("/hotAndNewAndRandom")
+    public CommonResult getHotAndNewAndRandomSongListInfo(){
+    	SongList hotSongList = userSongService.getHotSongListInfo();
+    	SongList newSongList = userSongService.getNewSongListInfo();
+    	SongList randomSongList = userSongService.getRandomSongListInfo();
+    	Map<String,SongList> map = new HashMap<>();
+    	map.put("hotList", hotSongList);
+    	map.put("newList", newSongList);
+    	map.put("randomList", randomSongList);
+    	
+    	return CommonResult.buildSuccess(map);
 	}
 	
-	@GetMapping("/new")
-	public CommonResult getNewSongListInfo(){
-		SongList songList = userSongService.getNewSongListInfo();
-    	return CommonResult.buildSuccess(songList);
-	}
-	
-	@GetMapping("/random")
-	public CommonResult getRandomSongListInfo(){
-		SongList songList = userSongService.getRandomSongListInfo();
-    	return CommonResult.buildSuccess(songList);
-	}
 	
 	@GetMapping("/style/{styleId}")
 	public CommonResult getSongListByStyle(@PathVariable("styleId")int styleId){
@@ -120,8 +119,8 @@ public class UserSongController {
 	
 	@GetMapping("/singer/{singerId}")
 	public CommonResult getSongListBySinger(@PathVariable("singerId")int singerId){
-		List<SongList> songLists = userSongService.getSongListBySinger(singerId);
-    	return CommonResult.buildSuccess(songLists);
+		SongList songList = userSongService.getSongListBySinger(singerId);
+    	return CommonResult.buildSuccess(songList);
 	}
 	
 	@GetMapping("/personal")
@@ -136,5 +135,18 @@ public class UserSongController {
 	    }else {
 	    	return CommonResult.buildSuccess(userSongService.getPersonalRecommend(user));
 	    }
+	}
+	
+	@GetMapping("/banner")
+	public CommonResult getBanner() {
+		return CommonResult.buildSuccess(userSongService.getBanner());
+	}
+	
+	@GetMapping("/songs")
+	public CommonResult getSongsByLikedSinger(@RequestHeader("token")String token) {
+//		User user = UserUtils.getCurrentUser(token);
+	    User user = new User();
+	    user.setId(1);
+		return CommonResult.buildSuccess(userSongService.getSongsByLikedSinger(user.getId()));
 	}
 }

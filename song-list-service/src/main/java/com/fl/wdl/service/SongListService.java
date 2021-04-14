@@ -1,5 +1,7 @@
 package com.fl.wdl.service;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,9 +105,17 @@ public class SongListService {
 		return songListMapper.getSongListsByScene(sceneId);
 	}
 	
-	public SongList getSongListsBySingerId(Integer singerId){
+	public SongList getSongListBySingerId(Integer singerId){
 		if(singerId == null || singerId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		return songListMapper.getSongListsBySingerId(singerId);
+		return songListMapper.getSongListBySingerId(singerId);
+	}
+	
+	public List<SongList> getSongListsBySingerIds(List<Integer> singerIds){
+		if(singerIds == null || singerIds.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		List<SongList> songLists = singerIds.stream().map(singerId->this.getSongListBySingerId(singerId)).collect(Collectors.toList());
+		if(songLists == null || songLists.size() <= 0)return null;
+		songLists = songLists.stream().map(songList->this.getSongListById(songList.getId())).collect(Collectors.toList());
+		return songLists;
 	}
 	
     public SongList getRandomSongList(){
@@ -143,7 +153,9 @@ public class SongListService {
 		return songListMapper.reduceCommentCount(id); 
 	}
 	
-    
+    public List<SongList> getSongListsOfTopSevenNew(){
+    	return songListMapper.getSongListsOfTopSevenNew();
+    }
 }
 
 

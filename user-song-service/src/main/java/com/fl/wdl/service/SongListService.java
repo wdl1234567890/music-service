@@ -49,8 +49,12 @@ public interface SongListService {
 	@GetMapping("/songList/scene/{sceneId}/songLists")
 	public CommonResult getSongListsByScene(@PathVariable("sceneId")Integer sceneId);
 	
-	@GetMapping("/songList/singer/{singerId}/songLists")
-	public CommonResult getSongListsBySingerId(@PathVariable("singerId")Integer singerId);
+	@GetMapping("/songList/singer/{singerId}/songList")
+	public CommonResult getSongListBySingerId(@PathVariable("singerId")Integer singerId);
+	
+	@GetMapping("/songList/singers/songLists")
+	public CommonResult getSongListsBySingerIds(@RequestBody List<Integer> singerIds);
+	
 	
 	@GetMapping("/songList/random")
     public CommonResult getRandomSongList();
@@ -72,4 +76,7 @@ public interface SongListService {
 	
 	@PutMapping("/songList/commentCount/reduce")
 	public CommonResult reduceCommentCount(@RequestBody String id);
+	
+	@GetMapping("/songList/topSevenNew")
+	public CommonResult getSongListsOfTopSevenNew();
 }

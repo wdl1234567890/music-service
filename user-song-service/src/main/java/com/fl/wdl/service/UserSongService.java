@@ -1,19 +1,21 @@
 package com.fl.wdl.service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,13 +23,13 @@ import com.fl.wdl.constant.PojoConst;
 import com.fl.wdl.constant.ResponseStatus;
 import com.fl.wdl.exception.FLException;
 import com.fl.wdl.mapper.UserSongMapper;
+import com.fl.wdl.pojo.Singer;
 import com.fl.wdl.pojo.Song;
 import com.fl.wdl.pojo.SongList;
 import com.fl.wdl.pojo.SongListSong;
 import com.fl.wdl.pojo.Style;
 import com.fl.wdl.pojo.User;
 import com.fl.wdl.pojo.UserSong;
-import com.fl.wdl.vo.CommonResult;
 
 @Service
 public class UserSongService {
@@ -46,6 +48,9 @@ public class UserSongService {
 	
 	@Autowired
 	StyleService styleService;
+	
+	@Autowired
+	SingerService singerService;
 	
 	@Autowired
 	RedisTemplate<String, User> redisTemplate;
@@ -181,8 +186,8 @@ public class UserSongService {
 		return JSONArray.parseArray(JSONArray.toJSONString(songListService.getSongListsByScene(sceneId).getData()), SongList.class);
 	}
 	
-	public List<SongList> getSongListBySinger(int singerId){
-		return JSONArray.parseArray(JSONArray.toJSONString(songListService.getSongListsBySingerId(singerId).getData()), SongList.class);
+	public SongList getSongListBySinger(int singerId){
+		return (SongList)songListService.getSongListBySingerId(singerId).getData();
 	}
 	
 	
@@ -383,5 +388,43 @@ public class UserSongService {
 		}
 		
 		return null;
+	}
+	
+	public List<SongList> getBanner(){
+		return JSONArray.parseArray(JSONArray.toJSONString(songListService.getSongListsOfTopSevenNew().getData()), SongList.class);
+	}
+	
+	public Set<Song> getSongsByLikedSinger(Integer userId){
+		if(userId == null || userId <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		QueryWrapper<UserSong> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("user_id", userId);
+		List<UserSong> userSongs = userSongMapper.selectList(queryWrapper);
+		if(userSongs == null || userSongs.size() <= 0)return null;
+		Map<String, Integer> singerScores = new HashMap<>();
+		List<String> songIds = userSongs.stream().map(userSong->userSong.getSongId()).collect(Collectors.toList());
+		List<Song> songsByIds = JSONArray.parseArray(JSONArray.toJSONString(songService.getSongsByIds(songIds).getData()), Song.class);
+		songsByIds.forEach(song->{
+			singerScores.put(song.getSingerName(), singerScores.getOrDefault(song.getSingerName(),0)+1);
+		});
+		List<String> singerNames = singerScores.entrySet().stream().sorted((entryA,entryB)->entryB.getValue() - entryA.getValue()).limit(10).map(entry->entry.getKey()).collect(Collectors.toList());
+		List<Song> songsBySingerNames = JSONArray.parseArray(JSONArray.toJSONString(songService.getSongsBySingerNames(singerNames).getData()), Song.class);
+		Set<Song> resultSongs = new HashSet<>();
+		if(songsBySingerNames != null && songsBySingerNames.size() > 0) {
+			Collections.shuffle(songsBySingerNames);
+			resultSongs.addAll(songsBySingerNames.stream().limit(10).collect(Collectors.toList()));
+		}
+		List<Singer> singers= JSONArray.parseArray(JSONArray.toJSONString(singerService.getSingersBySingerNames(singerNames).getData()), Singer.class);
+		if(singers != null && singers.size() > 0)	{
+			List<Integer> singerIds = singers.stream().limit(10).map(singer->singer.getId()).collect(Collectors.toList());
+			List<SongList> songLists= JSONArray.parseArray(JSONArray.toJSONString(songListService.getSongListsBySingerIds(singerIds).getData()), SongList.class);
+			if(songLists != null && songLists.size() > 0) {
+				songLists.forEach(songList->{
+					List<Song> songs = songList.getSongs();
+					Collections.shuffle(songs);
+					resultSongs.addAll(songs.stream().limit(3).collect(Collectors.toList()));
+				});
+			}
+		}
+		return resultSongs;
 	}
 }

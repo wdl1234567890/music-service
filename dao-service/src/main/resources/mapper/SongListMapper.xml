@@ -42,11 +42,14 @@
   	       title
   	       from (song_list sl left join song_list_song sls on sls.song_list_id = sl.id) left join song on sls.song_id=song.id where sl.id=#{id}
   </select>
-  <select id="getSongListsBySingerId" resultType="com.fl.wdl.pojo.SongList">
+  <select id="getSongListBySingerId" resultType="com.fl.wdl.pojo.SongList">
   	select sl.* from song_list sl,singer_song_list ssll where sl.id = ssll.song_list_id and ssll.singer_id=#{singerId}
   </select>
   <select id="getSongListByAllMatchTitle" resultType="com.fl.wdl.pojo.SongList">
   	select * from song_list where title=#{title}
+  </select>
+  <select id="getSongListsOfTopSevenNew" resultType="com.fl.wdl.pojo.SongList">
+  	select * from song_list order by create_time desc limit 0,8
   </select>
   <!-- <insert id="setStyle">
   	insert into song_list_style (id,song_list_id,style_id)values(null,#{songListId},#{styleId})
