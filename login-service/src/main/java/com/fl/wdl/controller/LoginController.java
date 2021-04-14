@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fl.wdl.constant.ResponseStatus;
@@ -24,17 +25,14 @@ public class LoginController {
 	
 	
 	@GetMapping
-	public CommonResult login(String code,String userName,String avator) {
+	public CommonResult login(@RequestParam("code")String code,@RequestParam("userName")String userName,@RequestParam("avator")String avator) {
 		String openId = loginService.getOpenId(code);
 		User user = new User();
 		user.setUserName(userName);
 		user.setAvator(avator);
 		user.setOpenId(openId);
-		String token = loginService.save(user);
-		
-		Map<String,String> data = new HashMap<String,String>();
-		data.put("token", token);
-		return CommonResult.buildSuccess(data);
+		Map<String,String> map = loginService.save(user);
+		return CommonResult.buildSuccess(map);
 	}
 	
 

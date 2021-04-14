@@ -3,6 +3,7 @@ package com.fl.wdl.service;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.fl.wdl.vo.CommonResult;
 
@@ -15,6 +16,12 @@ public interface UserService {
 //	
 	@GetMapping("/user")
 	public CommonResult getList();
+	
+	@GetMapping("/user/count")
+	public CommonResult getUserCount();
+	
+	@GetMapping("/user/{id}/styles")
+	public CommonResult getStyleList(@PathVariable("id") Integer id);
 //	
 //	@PostMapping
 //	public CommonResult save(@RequestBody User user);

@@ -3,6 +3,8 @@ package com.fl.wdl.pojo;
 import java.io.Serializable;
 import java.sql.Time;
 
+import javax.validation.constraints.NotNull;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 

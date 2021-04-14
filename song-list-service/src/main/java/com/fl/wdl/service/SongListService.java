@@ -93,19 +93,19 @@ public class SongListService {
 	}
 	
 	
-	public List<SongList> getSongListsByStyle(String styleId){
+	public List<SongList> getSongListsByStyle(Integer styleId){
 		if(styleId == null || styleId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		return songListMapper.getSongListsByStyle(styleId);
 	}
 	
-	public List<SongList> getSongListsByScene(String sceneId){
+	public List<SongList> getSongListsByScene(Integer sceneId){
 		if(sceneId == null || sceneId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		return songListMapper.getSongListsByScene(sceneId);
 	}
 	
-	public SongList getSongListsBySingerId(String id){
-		if(id == null || id.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		return songListMapper.getSongListsBySingerId(id);
+	public SongList getSongListsBySingerId(Integer singerId){
+		if(singerId == null || singerId.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		return songListMapper.getSongListsBySingerId(singerId);
 	}
 	
     public SongList getRandomSongList(){
@@ -115,6 +115,7 @@ public class SongListService {
     
     public SongList getHotSongList(){
     	List<SongList> songLists = songListMapper.getSongListsByAllMatchTitle("热门歌单");
+    	if(songLists == null || songLists.size() == 0)return null;
     	return this.getSongListById(songLists.get(0).getId());
     }
     
@@ -141,6 +142,7 @@ public class SongListService {
 		if(songList.getCommentCount() < 1)return false;	
 		return songListMapper.reduceCommentCount(id); 
 	}
+	
     
 }
 

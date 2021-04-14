@@ -1,9 +1,10 @@
 package com.fl.wdl.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fl.wdl.constant.ResponseStatus;
-import com.fl.wdl.exception.FLException;
 import com.fl.wdl.pojo.Style;
 import com.fl.wdl.pojo.User;
 import com.fl.wdl.service.UserService;
@@ -31,7 +29,29 @@ public class UserController {
 	@GetMapping("/{id}")
 	public CommonResult getUserById(@PathVariable("id") Integer id){
 		User user = userService.getUserById(id);
-		return CommonResult.buildSuccess(user);
+		List<Style> styles = userService.getStyleList(id);
+		Map<String,Object> data = new HashMap<>();
+		data.put("userBase", user);
+		data.put("styles", styles);
+		return CommonResult.buildSuccess(data);
+	}
+	
+	@GetMapping("/info")
+	public CommonResult getUser(@RequestHeader("token")String token){
+		//User user = UserUtils.getCurrentUser(token);
+		User user = new User();
+		user.setId(1);
+		List<Style> styles = userService.getStyleList(user.getId());
+		Map<String,Object> data = new HashMap<>();
+		data.put("userBase", user);
+		data.put("styles", styles);
+		return CommonResult.buildSuccess(data);
+	}
+	
+	@GetMapping("/OSSParam")
+	public CommonResult getPostAvatorOSSParam(){
+		Map<String,String> map = userService.getPostAvatorOSSParam();
+		return CommonResult.buildSuccess(map);
 	}
 	
 	@GetMapping
@@ -42,8 +62,8 @@ public class UserController {
 	
 	@PostMapping
 	public CommonResult save(@RequestBody User user) {
-		Boolean result = userService.save(user);
-		if(result)return CommonResult.buildSuccess(null);
+		Integer result = userService.save(user);
+		if(result != -1)return CommonResult.buildSuccess(result);
 		return CommonResult.buildError();
 	}
 	
@@ -75,21 +95,12 @@ public class UserController {
 		return CommonResult.buildError();
 	}
 	
-	@PostMapping("/styles")
-	public CommonResult addStyles(@RequestHeader("token")String token, @RequestBody List<Integer> styleIds) {	
+	@PutMapping("/styles")
+	public CommonResult saveStyles(@RequestHeader("token")String token, @RequestBody List<Integer> styleIds) {	
 
 		//Integer userId = UserUtils.getCurrentUser(token).getId();
 		Integer userId = 1;
-		Boolean result = userService.addStyles(userId, styleIds);
-		if(result)return CommonResult.buildSuccess(null);
-		return CommonResult.buildError();
-	}
-	
-	@DeleteMapping("/styles")
-	public CommonResult removeStyles(@RequestHeader("token")String token, @RequestBody List<Integer> styleIds) {
-		//Integer userId = UserUtils.getCurrentUser(token).getId();
-		Integer userId = 1;
-		Boolean result = userService.removeStyles(userId, styleIds);
+		Boolean result = userService.saveStyles(userId, styleIds);
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
 	}
@@ -100,6 +111,18 @@ public class UserController {
 		Integer userId = 1;
 		List<Style> styles = userService.getStyleList(userId);
 		return CommonResult.buildSuccess(styles);
+	}
+	
+	@GetMapping("/{id}/styles")
+	public CommonResult getStyleList(@PathVariable("id") Integer id){
+		List<Style> styles = userService.getStyleList(id);
+		return CommonResult.buildSuccess(styles);
+	}
+	
+	@GetMapping("/count")
+	public CommonResult getUserCount() {
+		int count = userService.getUserCount();
+		return CommonResult.buildSuccess(count);
 	}
 
 }

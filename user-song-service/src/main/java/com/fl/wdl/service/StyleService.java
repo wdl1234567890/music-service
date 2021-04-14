@@ -12,8 +12,8 @@ public interface StyleService {
 //	@PostMapping
 //	public CommonResult addStyle(@RequestBody Style style);
 //	
-//	@GetMapping
-//	public CommonResult getList();
+	@GetMapping
+	public CommonResult getList();
 	
 	@GetMapping("/style/user/{userId}/styles")
 	public CommonResult getStylesByUserId(@PathVariable("userId")Integer userId);

@@ -12,12 +12,12 @@ import com.fl.wdl.pojo.Style;
 
 @Mapper
 public interface SongListMapper extends BaseMapper<SongList>{
-	List<SongList> getSongListsByStyle(String styleId);
-	List<SongList> getSongListsByScene(String sceneId);
+	List<SongList> getSongListsByStyle(Integer styleId);
+	List<SongList> getSongListsByScene(Integer sceneId);
 	SongList getSongListById(String id);
 	List<SongList> getSongListsByAllMatchTitle(String title);
 	List<SongList> getSongListsByLikeTitle(String title);
-	SongList getSongListsBySingerId(String singerId);
+	SongList getSongListsBySingerId(Integer singerId);
 	SongList getSongListByAllMatchTitle(String title);
     public Boolean addCommentCount(String id);	
 	public Boolean reduceCommentCount(String id);

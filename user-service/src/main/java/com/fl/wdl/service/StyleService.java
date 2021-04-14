@@ -1,5 +1,7 @@
 package com.fl.wdl.service;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,9 +30,9 @@ public interface StyleService {
 	@GetMapping("/style/user/{userId}/styles")
 	public CommonResult getStylesByUserId(@PathVariable("userId")Integer userId);
 	
-	@PostMapping("/style/user/style")
-	public CommonResult addStyleToUser(@RequestBody UserStyle userStyle);
+	@PostMapping("/style/user/styles")
+	public CommonResult addStylesToUser(@RequestBody List<UserStyle> userStyle);
 	
-	@DeleteMapping("/style/user/style")
-	public CommonResult removeStyleFromUser(@RequestBody UserStyle userStyle);
+	@DeleteMapping("/style/user/styles")
+	public CommonResult removeStylesFromUser(@RequestBody List<UserStyle> userStyle);
 }

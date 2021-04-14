@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fl.wdl.pojo.Comment;
 import com.fl.wdl.pojo.User;
 import com.fl.wdl.service.CommentService;
+import com.fl.wdl.validation.Groups;
 import com.fl.wdl.vo.CommonResult;
 
 @RestController
@@ -26,7 +28,7 @@ public class CommentController {
 	CommentService commentService;
 	
 	@PostMapping
-	public CommonResult addComment(@RequestHeader("token") String token, @RequestBody Comment comment) {
+	public CommonResult addComment(@RequestHeader("token") String token, @RequestBody @Validated(Groups.Add.class)Comment comment) {
 		//User user = UserUtils.getCurrentUser(token);
 		User user = new User();
 		user.setId(1);
@@ -36,7 +38,7 @@ public class CommentController {
 	}
 	
 	@DeleteMapping
-	public CommonResult removeComment(@RequestHeader("token") String token,@RequestBody Comment comment) {
+	public CommonResult removeComment(@RequestHeader("token") String token,@RequestBody @Validated(Groups.Delete.class)Comment comment) {
 		//User user = UserUtils.getCurrentUser(token);
 		User user = new User();
 		user.setId(1);
@@ -46,7 +48,7 @@ public class CommentController {
 	}
 
 	@PutMapping("/thumb/{id}")
-	public CommonResult thumbUpComment(@PathVariable("id")String id) {
+	public CommonResult thumbUpComment(@PathVariable("id") String id) {
 		int result = commentService.thumbUpComment(id);
 		if(result > 0)return CommonResult.buildSuccess(null);
 		else return CommonResult.buildError();

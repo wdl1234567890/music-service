@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fl.wdl.constant.ResponseStatus;
+import com.fl.wdl.exception.FLException;
 import com.fl.wdl.pojo.Scene;
 import com.fl.wdl.pojo.SongList;
 import com.fl.wdl.pojo.SongListScene;
@@ -26,8 +29,6 @@ public class SongListController {
 	@Autowired
 	SongListService songListService;
 	
-	
-	
 	@GetMapping("/{id}")
 	public CommonResult getSongListById(@PathVariable("id") String id) {
 		SongList songList = songListService.getSongListById(id);
@@ -36,12 +37,14 @@ public class SongListController {
 	
 	@PostMapping
 	public CommonResult addSongList(@RequestBody SongList songList) {
+		if(songList == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		String result = songListService.addSongList(songList);
 		return CommonResult.buildSuccess(result);
 	}
 	
 	@PutMapping
 	public CommonResult updateSongList(@RequestBody SongList songList) {
+		if(songList == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		Boolean result = songListService.updateSongList(songList);
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
@@ -49,9 +52,17 @@ public class SongListController {
 	
 	@PostMapping("/song")
 	public CommonResult addSong(@RequestBody SongListSong songListSong) {
+		if(songListSong == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		Boolean result = songListService.addSong(songListSong.getSongListId(),songListSong.getSongId());
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
+	}
+	
+	@PostMapping("/songList/songs")
+	public CommonResult addSongs(@RequestBody List<SongListSong> songListSongs) {
+		if(songListSongs == null || songListSongs.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		songListSongs.forEach(songListSong->songListService.addSong(songListSong.getSongListId(),songListSong.getSongId()));
+		return CommonResult.buildSuccess(null);
 	}
 
 	@GetMapping("/{songListId}/styles")
@@ -69,25 +80,26 @@ public class SongListController {
 	
 	@PostMapping("/style")
 	public CommonResult addStyle(@RequestBody SongListStyle songListStyle) {
+		if(songListStyle == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		Boolean result = songListService.addStyle(songListStyle.getSongListId(), songListStyle.getStyleId());
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
 	}
 	
 	@GetMapping("/style/{styleId}/songLists")
-	public CommonResult getSongListsByStyle(@PathVariable("styleId")String styleId){
+	public CommonResult getSongListsByStyle(@PathVariable("styleId")Integer styleId){
 		List<SongList> songLists = songListService.getSongListsByStyle(styleId);
 		return CommonResult.buildSuccess(songLists);
 	}
 	
 	@GetMapping("/scene/{sceneId}/songLists")
-	public CommonResult getSongListsByScene(@PathVariable("sceneId")String sceneId){
+	public CommonResult getSongListsByScene(@PathVariable("sceneId")Integer sceneId){
 		List<SongList> songLists = songListService.getSongListsByScene(sceneId);
 		return CommonResult.buildSuccess(songLists);
 	}
 	
 	@GetMapping("/singer/{singerId}/songLists")
-	public CommonResult getSongListsBySingerId(@PathVariable("singerId")String singerId){
+	public CommonResult getSongListsBySingerId(@PathVariable("singerId")Integer singerId){
 		SongList songLists = songListService.getSongListsBySingerId(singerId);
 		return CommonResult.buildSuccess(this.getSongListById(songLists.getId()));
 	}
@@ -101,6 +113,7 @@ public class SongListController {
 	@GetMapping("/hot")
     public CommonResult getHotSongList(){
 		SongList songList = songListService.getHotSongList();
+		if(songList == null)return CommonResult.buildSuccess(null);
 		List<String> songNames = songList.getSongs().stream().map(song->song.getSongName()).limit(3).collect(Collectors.toList());
 		songList.getMetaObject().put("songNames", songNames);
 		return CommonResult.buildSuccess(songList);
@@ -116,6 +129,7 @@ public class SongListController {
 	
 	@PostMapping("/scene")
 	public CommonResult addScene(@RequestBody SongListScene songListScene) {
+		if(songListScene == null)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
 		Boolean result = songListService.addScene(songListScene.getSongListId(), songListScene.getSceneId());
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();

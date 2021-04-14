@@ -38,17 +38,20 @@ public class StyleService {
 		return true;
 	}
 	
-	public Boolean addStyleToUser(Integer userId, Integer styleId) {
-		if(userId == null || userId < 1 || styleId == null || styleId < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		Style style = styleMapper.getUserStyleByUserId(userId, styleId);
-		if(style != null)return true;
-		return styleMapper.addStyleToUser(userId, styleId);
+	
+	public Boolean addStylesToUser(Integer userId, List<Integer> styleIds) {
+		if(userId == null || userId < 1 || styleIds == null || styleIds.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		styleIds.forEach(styleId->{
+			styleMapper.addStyleToUser(userId, styleId);
+		});
+		return true;
 	}
-	public Boolean removeStyleFromUser(Integer userId,Integer styleId) {
-		if(userId == null || userId < 1 || styleId == null || styleId < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		Style style = styleMapper.getUserStyleByUserId(userId, styleId);
-        if(style == null)return true;
-		return styleMapper.removeStyleFromUser(userId, styleId);
+	public Boolean removeStylesFromUser(Integer userId,List<Integer> styleIds) {
+		if(userId == null || userId < 1 || styleIds == null || styleIds.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		styleIds.forEach(styleId->{
+			styleMapper.removeStyleFromUser(userId, styleId);
+		});
+		return true;
 	}
 	
 	public List<Style> getStylesFromSong(String songId){

@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.constraints.Size;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,13 +24,14 @@ import com.fl.wdl.vo.CommonResult;
 
 @RestController
 @RequestMapping("/search")
+@Validated
 public class SearchKeyController {
 	
 	@Autowired
 	SearchService searchService;
 	
 	@GetMapping("/{key}")
-	public CommonResult search(@PathVariable("key")String key){
+	public CommonResult search(@PathVariable("key") @Size(min=1,max=40)String key){
 		Set<String> keys = new HashSet<>();
 		List<Song> songs = searchService.searchSongs(key,keys);
 		List<SongList> songLists = searchService.searchSongLists(key,keys);

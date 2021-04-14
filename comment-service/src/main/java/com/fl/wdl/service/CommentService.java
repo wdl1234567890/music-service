@@ -36,9 +36,7 @@ public class CommentService {
 		//一级评论
 		if(fromId.equals(songOrListId)) {
 			comment.setLevel(PojoConst.COMMENT_LEVEL_ONE);
-			if(!songService.addCommentCount(songOrListId).getSuccess()) {
-				songListService.addCommentCount(songOrListId);
-			}
+			
 		}else {
 			Comment fromComment = commentMapper.selectById(fromId);
 			//二级评论
@@ -52,6 +50,10 @@ public class CommentService {
 			}
 	        
 	        this.addReplyCount(fromId);
+		}
+		
+		if(!songService.addCommentCount(songOrListId).getSuccess()) {
+			songListService.addCommentCount(songOrListId);
 		}
 		
 		comment.setId(UUID.randomUUID().toString());
@@ -74,13 +76,12 @@ public class CommentService {
 		if(comment1 == null)return false;
 		Boolean result = commentMapper.softDeleteById(id);
         if(!result)return false;
-        if(level == 0) {
-        	if(!songService.reduceCommentCount(fromId).getSuccess()) {
-				songListService.reduceCommentCount(fromId);
-			}
-        }else {
+        if(level != 0) {
         	this.reduceReplyCount(fromId);
-        }    
+        } 
+        if(!songService.reduceCommentCount(fromId).getSuccess()) {
+			songListService.reduceCommentCount(fromId);
+		}
 		return true;
 	}
 

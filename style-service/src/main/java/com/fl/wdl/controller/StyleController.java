@@ -1,6 +1,7 @@
 package com.fl.wdl.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,18 +47,18 @@ public class StyleController {
 		return CommonResult.buildSuccess(styles);
 	}
 	
-	@PostMapping("/user/style")
-	public CommonResult addStyleToUser(@RequestBody UserStyle userStyle) {
-		if(userStyle.getStyleId() == null || userStyle.getStyleId() < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		Boolean result = styleService.addStyleToUser(userStyle.getUserId(), userStyle.getStyleId());
+	@PostMapping("/user/styles")
+	public CommonResult addStylesToUser(@RequestBody List<UserStyle> userStyles) {
+		if(userStyles == null || userStyles.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		Boolean result = styleService.addStylesToUser(userStyles.get(0).getUserId(), userStyles.stream().map(userStyle->userStyle.getStyleId()).collect(Collectors.toList()));
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
 	}
 	
-	@DeleteMapping("/user/style")
-	public CommonResult removeStyleFromUser(@RequestBody UserStyle userStyle) {
-		if(userStyle.getStyleId() == null || userStyle.getStyleId() < 1)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		Boolean result = styleService.removeStyleFromUser(userStyle.getUserId(), userStyle.getStyleId());
+	@DeleteMapping("/user/styles")
+	public CommonResult removeStylesFromUser(@RequestBody List<UserStyle> userStyles) {
+		if(userStyles == null || userStyles.size() <= 0)throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
+		Boolean result = styleService.removeStylesFromUser(userStyles.get(0).getUserId(), userStyles.stream().map(userStyle->userStyle.getStyleId()).collect(Collectors.toList()));
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
 	}

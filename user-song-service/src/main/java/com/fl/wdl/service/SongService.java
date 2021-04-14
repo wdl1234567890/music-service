@@ -13,6 +13,15 @@ public interface SongService {
 	@GetMapping("/song/{id}")
 	public CommonResult getSongById(@PathVariable("id")String id);
 	
+	@GetMapping("/song/count")
+	public CommonResult getSongCount();
+	
+	@GetMapping
+	public CommonResult getList();
+	
+	@GetMapping("/song/{id}/styles")
+	public CommonResult getStyles(@PathVariable("id")String id);
+	
 //	@GetMapping("/type/{column}/key/{key}/songs")
 //	public CommonResult getSongsByColumnLike(@PathVariable("column")String column,@PathVariable("key")String key);
 //	

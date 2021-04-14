@@ -1,5 +1,6 @@
 package com.fl.wdl.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fl.wdl.constant.ResponseStatus;
 import com.fl.wdl.exception.FLException;
 import com.fl.wdl.pojo.User;
+import com.fl.wdl.vo.CommonResult;
 
 @Service
 public class LoginService {
@@ -36,10 +38,16 @@ public class LoginService {
 		return openId;
 	}
 	
-	public String save(User user) {
+	public Map<String,String> save(User user) {
 		if(user == null || user.equals(""))throw new FLException(ResponseStatus.PARAM_IS_EMPTY.code(),ResponseStatus.PARAM_IS_EMPTY.message());
-		userService.save(user);
-		return tokenService.saveUserToCache(user);
+		CommonResult commonResult  = userService.save(user);
+		if(commonResult.getSuccess()) {
+			Map<String,String> map = new HashMap<>();
+			map.put("result", String.valueOf(commonResult.getData()));
+			map.put("token", tokenService.saveUserToCache(user));
+			return map;
+		}
+		return null;
 	}
 
 	

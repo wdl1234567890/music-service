@@ -3,6 +3,7 @@ package com.fl.wdl.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import com.fl.wdl.pojo.SongScene;
 import com.fl.wdl.pojo.SongStyle;
 import com.fl.wdl.pojo.Style;
 import com.fl.wdl.service.SongService;
+import com.fl.wdl.validation.Groups;
 import com.fl.wdl.vo.CommonResult;
 
 @RestController
@@ -71,14 +73,14 @@ public class SongController {
 	
 
 	@PostMapping("/style")
-	public CommonResult addStyle(@RequestBody SongStyle songStyle) {
+	public CommonResult addStyle(@RequestBody @Validated(Groups.Add.class)SongStyle songStyle) {
 		Boolean result = songService.addStyle(songStyle.getSongId(), songStyle.getStyleId());
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError();
 	}
 	
 	@PostMapping("/scene")
-	public CommonResult addScene(@RequestBody SongScene songScene) {
+	public CommonResult addScene(@RequestBody @Validated(Groups.Add.class)SongScene songScene) {
 		Boolean result = songService.addScene(songScene.getSongId(), songScene.getSceneId());
 		System.out.println(result);
 		if(result)return CommonResult.buildSuccess(null);
@@ -97,5 +99,11 @@ public class SongController {
 		Boolean result = songService.reduceCommentCount(id); 
 		if(result)return CommonResult.buildSuccess(null);
 		return CommonResult.buildError(); 
+	}
+	
+	@GetMapping("/count")
+	public CommonResult getSongCount() {
+		int count = songService.getSongCount();
+		return CommonResult.buildSuccess(count);
 	}
 }

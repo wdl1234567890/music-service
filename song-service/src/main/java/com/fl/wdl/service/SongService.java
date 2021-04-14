@@ -103,6 +103,10 @@ public class SongService {
 		if(song.getCommentCount() < 1)return false;
 		return songMapper.reduceCommentCount(id); 
 	}
+	
+	public int getSongCount() {
+		return songMapper.selectCount(null);
+	}
 }
 
 
